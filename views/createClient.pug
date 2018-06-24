@@ -1,0 +1,17 @@
+extends layout
+block content
+    h1 Register a Client
+    form(method="POST" action="/clients/create")
+        div.form-group
+            label(for='name') Company Name:
+            input#name.form-control(type='name', placeholder='Company Name' name='name')
+        div.form-group
+            label Manager's Name:
+            input#firstname.form-control(type='text', placeholder='First Name' name='firstname')
+            input#lastname.form-control(type='text', placeholder='Last Name' name='lastname')
+        div.form-group
+            label(for='position') Manager's Position:
+            input#position.form-control(type='text', placeholder='Manager\'s Position' name='position')
+        div.form-group
+        button.btn.btn-primary(type='submit') Register
+ 

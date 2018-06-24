@@ -42,6 +42,26 @@ exports.fixtures = function(data) {
   }, done)
 }
 
+exports.create = function(mode,table, data, done){
+  exports.connect(mode, function(){
+
+    var pool = state.pool;
+    if (!pool) {
+      return done(new Error('Missing database connection.'));
+    }
+
+    pool.query('INSERT INTO '+table+' SET ?', data, function(err, rows, fields) {
+      if (!err) {
+	console.log("Success");
+      } else {
+	console.log(err);
+      }
+      done(err);
+    });
+
+  });
+};
+
 /*
 var connection = mysql.createConnection({
   host: 'localhost',

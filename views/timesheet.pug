@@ -1,0 +1,24 @@
+extends layout
+block content
+    br
+    div.container
+        h4 #{firstname} #{lastname} (#{email})
+        br
+        form(method="POST" action="/timesheet")
+            div.form-group
+                label(for='title') Work Title:
+                input#title.form-control(type='title', placeholder='Title of Task' name='title')
+            div.form-group
+                label(for='clientid') Client:
+                select(name='clientid')
+                    each c in clients
+                        option(value=c.clientid) #{c.name}
+            div.form-group
+                label(for='start') Start Time:
+                input#start.form-control(type='text', placeholder='Start of Period' name='start')
+            div.form-group
+                label(for='end') End Time:
+                input#end.form-control(type='text', placeholder='End of Period' name='end')
+            button.btn.btn-primary(type='submit') Submit
+
+    div.container
