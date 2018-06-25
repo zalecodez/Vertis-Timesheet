@@ -12,9 +12,16 @@ var timesheetRouter = require('./routes/timesheet');
 var commentsRouter = require('./routes/comments');
 
 var db = require('./db');
-db.initdb(function(){
-  console.log("success");
-});
+for(i=1; i <= 3; i++){
+  db.initdb(function(err){
+    if(err){
+      console.log(err);
+    }
+    else{
+      console.log("success");
+    }
+  });
+}
 var app = express();
 
 // view engine setup
