@@ -1,10 +1,12 @@
 extends layout
+include mixins/perioditem.pug
 block content
     br
-    div.container
+    h4 New Entry
+    div.container.border.border-primary.rounded(style="padding:10px")
         h4 #{firstname} #{lastname} (#{email})
         br
-        form(method="POST" action="/timesheet")
+        form(method="POST" action="/timesheet/add")
             div.form-group
                 label(for='title') Work Title:
                 input#title.form-control(type='title', placeholder='Title of Task' name='title')
@@ -12,13 +14,27 @@ block content
                 label(for='clientid') Client:
                 select(name='clientid')
                     each c in clients
-                        option(value=c.clientid) #{c.name}
+                        option(value=c.clientid) #{c.name} - Manager: #{c.firstname} #{c.lastname}, #{c.position}
             div.form-group
-                label(for='start') Start Time:
-                input#start.form-control(type='text', placeholder='Start of Period' name='start')
+                label(for='date') Date:
+                input#date.period.form-control(type='date' name='date')
             div.form-group
-                label(for='end') End Time:
-                input#end.form-control(type='text', placeholder='End of Period' name='end')
-            button.btn.btn-primary(type='submit') Submit
+                label(for='starttime') Start Time:
+                input#starttime.period.form-control(type='time' name='starttime')
+
+            div.form-group
+                label(for='endtime') End Time:
+                input#endtime.period.form-control(type='time' name='endtime')
+            div.form-group
+                h5#periodlength Period Length:  
+
+            div.form-group
+                label(for='comment') Comment:
+                textarea#comment.form-control(rows='2' name='comment')
+            button#submitPeriod.btn.btn-primary(type='submit') Submit
+
+    br
+    br
 
     div.container
+        +periodList(periods,clients)

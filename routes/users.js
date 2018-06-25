@@ -129,6 +129,8 @@ users.post('/login', function(req, res) {
 	      }
 
 	      res.redirect('/');
+
+	      connection.end();
 	    } else {
 	      appData.error = 1;
 	      appData["data"] = "Email and Password does not match";

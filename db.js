@@ -56,7 +56,7 @@ exports.create = function(mode,table, data, done){
       } else {
 	console.log(err);
       }
-      done(err);
+      done(err,rows);
     });
 
   });
