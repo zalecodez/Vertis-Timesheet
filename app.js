@@ -11,6 +11,10 @@ var clientsRouter = require('./routes/clients');
 var timesheetRouter = require('./routes/timesheet');
 var commentsRouter = require('./routes/comments');
 
+var db = require('./db');
+db.initdb(function(){
+  console.log("success");
+});
 var app = express();
 
 // view engine setup

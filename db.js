@@ -41,6 +41,8 @@ exports.fixtures = function(data) {
   }, done)
 }
 
+
+
 exports.create = function(mode,table, data, done){
   exports.connect(mode, function(){
 
@@ -61,20 +63,6 @@ exports.create = function(mode,table, data, done){
   });
 };
 
-/*
-var connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'web',
-  password: 'verTis~23',
-  database: 'vertis',
-});
-
-connection.connect(function(err){
-  if (err) throw err;
-  console.log("You are now connected...");
-});
-*/
-
 exports.drop = function(tables, done) {
   var pool = state.pool
   if (!pool) return done(new Error('Missing database connection.'))
@@ -83,3 +71,73 @@ exports.drop = function(tables, done) {
     pool.query('DELETE * FROM ' + name, cb);
   }, done);
 }
+
+
+exports.initdb = function(cb){
+  exports.connect(exports.MODE_TEST,function(){
+    pool = exports.get();
+
+    pool.query("SELECT 1 FROM Users LIMIT 1", function(err,rows,fields){
+      if(err){
+
+
+	createUsers = new Promise((resolve, reject) => {
+	  pool.query("CREATE TABLE Users(userid int not null primary key auto_increment, email varchar(100) not null, firstname varchar(100) not null, address varchar(255), password varchar(255) not null)", function(err,rows,fields){
+	    if (err){
+	      reject(err);
+	    }
+	    else{
+	      resolve();
+	    }
+	  });
+	});
+
+
+	createClients = new Promise((resolve, reject) => {
+	  pool.query("CREATE TABLE Clients(clientid int not null primary key auto_increment, name varchar(100) not null, firstname varchar(100) not null, lastname varchar(100) not null, position varchar(255) not null)", function(err,rows,fields){
+	    if (err){
+	      reject(err);
+	    }
+	    else{
+	      resolve();
+	    }
+	  });
+	});
+
+
+	createPeriods = new Promise((resolve, reject) => {
+	  pool.query("CREATE TABLE Periods(userid int not null, foreign key (userid) references Users(userid), clientid int not null, foreign key (clientid) references Clients(clientid), periodid int not null primary key auto_increment, title varchar(255) not null, start datetime not null, end datetime not null)", function(err,rows,fields){
+	    if (err){
+	      reject(err);
+	    }
+	    else{
+	      resolve();
+	    }
+	  });
+	});
+
+
+
+	createComments = new Promise((resolve, reject) => {
+	  pool.query("create table Comments( periodid int not null, foreign key (periodid) references Periods(periodid), userid int not null, foreign key(userid) references Users(userid), comment varchar(255) not null, commentid int not null primary key auto_increment)", function(err,rows,fields){
+	    if (err){
+	      reject(err);
+	    }
+	    else{
+	      resolve();
+	    }
+	  });
+	});
+	
+
+	Promise.all([creatUsers, createClients, createPeriods, createComments]).then(function(){
+	  cb();
+	},
+	function(reason){
+	  console.log(reason);
+	});
+      }
+    });
+  });
+};
+  
