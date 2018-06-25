@@ -13,13 +13,12 @@ var state = {
 }
 
 exports.connect = function(mode, done){
-  state.pool = mysql.createPool({
-    host: 'localhost',
-    user: 'web',
-    password: 'verTis~23',
-    database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB,
-  })
-
+  state.pool = mysql.createPool(process.env.CLEARDB_DATABASE_URL || {
+  host: 'localhost',
+  user: 'web',
+  password: 'verTis~23',
+  database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB,
+});
   state.mode = mode;
   done();
 }
