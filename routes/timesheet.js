@@ -16,15 +16,17 @@ timesheet.get('/', function(req, res, next) {
 	if (err){
 	  console.log(err);
 	  res.send(err);
+	  connection.end();
 	}
 	else{
 
 	  clients = rows;
 	  sess = req.session;
-	  db.connect(db.MODE_TEST, function(err){
+	  db.connect(db.MODE_TEST, function(err,rows,pool){
 	    if (err){
 	      console.log(err);
 	      res.send(err);
+	      pool.end();
 	    }
 	    else{
 	      connection = db.get();
@@ -32,6 +34,7 @@ timesheet.get('/', function(req, res, next) {
 		if (err){
 		  console.log(err);
 		  res.send(err);
+		  connection.end();
 		}
 		else{
 		  //periods = Object.assign({},rows);
@@ -42,10 +45,10 @@ timesheet.get('/', function(req, res, next) {
 
 		      connection.query("SELECT Users.firstname,Users.lastname, Comments.comment, Comments.periodid FROM Comments LEFT JOIN Users ON Comments.userid=Users.userid WHERE periodid="+periodid,function(err, rows, fields){
 			if (err){
-			  reject(err);
+			  reject(err,connection);
 			}
 			else{
-			  resolve(rows);
+			  resolve(rows,connection);
 			}
 		      });
 		    });
@@ -57,7 +60,7 @@ timesheet.get('/', function(req, res, next) {
 		    comms.push(getComments(periodid));
 		  }
 
-		  Promise.all(comms).then(function(values){
+		  Promise.all(comms).then(function(values,connection){
 
 		    comments = {};
 		    i=0;
@@ -79,7 +82,8 @@ timesheet.get('/', function(req, res, next) {
 
 		    connection.end()
 		  },
-		  function(error){
+		  function(error,connection){
+		    connection.end()
 		    console.log(error);
 		  });
 		}

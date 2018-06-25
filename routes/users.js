@@ -73,13 +73,14 @@ users.post('/register', function(req, res) {
     "address": req.body.address
   }
 
-  db.create(db.MODE_TEST,'Users',userData,function(err){
+  db.create(db.MODE_TEST,'Users',userData,function(err,rows,pool){
     if(err){
       console.log(err);
     }
     else{
       res.redirect('/')
     }
+    pool.end();
   });
 });
 
@@ -129,12 +130,12 @@ users.post('/login', function(req, res) {
 
 	      res.redirect('/');
 
-	      connection.end();
 	    } else {
 	      appData.error = 1;
 	      appData["data"] = "Email and Password does not match";
 	      res.status(204).json(appData);
 	    }
+	    connection.end();
 	  } else {
 	    console.log("no rows");
 	    appData.error = 1;

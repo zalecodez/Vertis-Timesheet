@@ -57,7 +57,7 @@ exports.create = function(mode,table, data, done){
       } else {
 	console.log(err);
       }
-      done(err,rows);
+      done(err,rows,pool);
     });
 
   });
@@ -80,7 +80,7 @@ exports.initdb = function(cb){
     pool.query("SELECT 1 FROM Comments, Users, Clients, Periods LIMIT 1", function(err,rows,fields){
       if(err){
 
-
+/*
 	queries = [
 	  "CREATE TABLE Users(userid int not null primary key auto_increment, email varchar(100) not null, firstname varchar(100) not null, address varchar(255), password varchar(255) not null)",
 	  "CREATE TABLE Clients(clientid int not null primary key auto_increment, name varchar(100) not null, firstname varchar(100) not null, lastname varchar(100) not null, position varchar(255) not null)",
@@ -95,12 +95,11 @@ exports.initdb = function(cb){
 	      console.log(err);
 	    }
 	  });
-	}, cb);
+	}, cb(pool));
 
-
-	/*
+*/
 	createUsers = new Promise((resolve, reject) => {
-	  pool.query("CREATE TABLE Users(userid int not null primary key auto_increment, email varchar(100) not null, firstname varchar(100) not null, address varchar(255), password varchar(255) not null)", function(err,rows,fields){
+	  pool.query("CREATE TABLE Users(userid int not null primary key auto_increment, email varchar(100) not null, firstname varchar(100) not null, lastname varchar(100) not null, address varchar(255), password varchar(255) not null)", function(err,rows,fields){
 	    if (err){
 	      reject(err);
 	    }
@@ -149,13 +148,11 @@ exports.initdb = function(cb){
 	
 
 	Promise.all([createUsers, createClients, createPeriods, createComments]).then(function(){
-	  cb();
+	  cb(pool);
 	},
 	function(reason){
 	  console.log(reason);
 	});
-
-	*/
       }
     });
   });

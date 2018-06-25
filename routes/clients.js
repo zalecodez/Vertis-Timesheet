@@ -14,13 +14,14 @@ clients.post('/create', function(req, res) {
     "position": req.body.position,
   }
 
-  db.create(db.MODE_TEST,'Clients',clientData,function(err){
+  db.create(db.MODE_TEST,'Clients',clientData,function(err,rows,pool){
     if(err){
       console.log(err);
     }
     else{
       res.redirect('/')
     }
+    pool.end();
   });
 });
 
@@ -42,6 +43,7 @@ clients.get('/getAll', function(req, res){
 	else{
 	  res.send(rows);
 	}
+	connection.end();
       });
     }
   });

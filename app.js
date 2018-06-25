@@ -13,13 +13,8 @@ var commentsRouter = require('./routes/comments');
 
 var db = require('./db');
 for(i=1; i <= 3; i++){
-  db.initdb(function(err){
-    if(err){
-      console.log(err);
-    }
-    else{
-      console.log("success");
-    }
+  db.initdb(function(pool){
+    pool.end();
   });
 }
 var app = express();
