@@ -8,12 +8,14 @@
   "dependencies": {
     "async": "^2.6.1",
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "express-session": "^1.15.6",
     "http-errors": "~1.6.2",
     "morgan": "~1.9.0",
     "mysql": "^2.15.0",
+    "mysql-password": "0.0.1",
     "pug": "2.0.0-beta11"
   }
 }
