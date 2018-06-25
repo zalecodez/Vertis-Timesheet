@@ -25,6 +25,7 @@ comments.get('/', function(req, res, next) {
 	  res.send(comments);
 	}
 	connection.end();
+	db.get().end();
       });
     }
   });

@@ -5,6 +5,7 @@ var cors = require('cors');
 var pass = require('mysql-password');
 var token;
 
+
 var sess;
 
 
@@ -18,8 +19,9 @@ users.use(cors());
 
 process.env.SECRET_KEY = 'veritest';
 
-users.get('/register', function(req, res) {
+users.get('/register', function(req, res, next) {
   res.render('register');
+  next();
 });
 /*
 users.post('/register', function(req, res) {
@@ -101,9 +103,11 @@ users.post('/login', function(req, res) {
       appData["error"] = 1;
       appData["data"] = "Internal Server Error";
       res.status(500).json(appData);
+      db.get().end();
     } else {
       connection = db.get();
       connection.query('SELECT * FROM Users WHERE email = ?', [email], function(err, rows, fields) {
+	connection.end();
 	if (err) {
 	  console.log(err);
 	  appData.error = 1;
@@ -131,16 +135,13 @@ users.post('/login', function(req, res) {
 	      res.redirect('/');
 
 	    } else {
-	      appData.error = 1;
-	      appData["data"] = "Email and Password does not match";
-	      res.status(204).json(appData);
+
+	      req.flash('danger',"Error! Credentials not recognized");
+	      res.redirect('/users/login');
 	    }
-	    connection.end();
 	  } else {
-	    console.log("no rows");
-	    appData.error = 1;
-	    appData["data"] = "Email does not exists!";
-	    res.status(204).json(appData);
+	      req.flash('danger',"Error! Credentials not recognized");
+	      res.redirect('/users/login');
 	  }
 	}
       });
@@ -154,6 +155,7 @@ users.get('/logout', function(req, res) {
       console.log(err);
     }
     res.redirect('/');
+    db.get().end();
   });
 });
 
@@ -168,6 +170,7 @@ users.get('/getUsers', function(req, res) {
       appData["error"] = 1;
       appData["data"] = "Internal Server Error";
       res.status(500).json(appData);
+      db.get().end();
     } else {
       connection = db.get();
       connection.query('SELECT * FROM Users', function(err, rows, fields) {
@@ -180,7 +183,7 @@ users.get('/getUsers', function(req, res) {
 	  res.status(204).json(appData);
 	}
       });
-      connection.release();
+      db.get().end();
     }
   });
 });

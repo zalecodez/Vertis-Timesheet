@@ -1,0 +1,26 @@
+mixin flash-messages(messages)
+    br
+    if messages
+        - console.log(messages);
+        #flash-messages.container
+            if messages.info
+                +flash-message(messages.info,'info')
+            if messages.success
+                +flash-message(messages.success,'success')
+            if messages.warning
+                +flash-message(messages.warning,'warning')
+            if messages.danger
+                +flash-message(messages.danger,'danger')
+
+mixin flash-message(message, type)
+    - 
+        console.log(message);
+        if(!message.length){
+            message = [message];
+        }
+
+    for m in message
+        div(class='alert alert-dismissible alert-'+type)
+            a.close(href="#" data-dismiss="alert" aria-label="close") &times;
+            strong #{m}
+

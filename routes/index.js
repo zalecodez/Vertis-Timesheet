@@ -19,8 +19,7 @@ router.get('/', function(req, res, next) {
       res.redirect('/timesheet');
     }
   }else{
-    res.render('login');
-    //res.render('index', { title: 'Express' });
+    res.redirect('/users/login');
   }
 });
 

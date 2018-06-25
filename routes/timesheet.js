@@ -1,6 +1,6 @@
 var express = require('express');
 var timesheet = express.Router();
-
+//var locus = require('locus');
 var db = require('../db');
 var sess;
 
@@ -9,58 +9,76 @@ timesheet.get('/', function(req, res, next) {
     if (err){
       console.log(err);
       res.send(err);
+      db.get().end();
     }
     else{
       connection = db.get();
       connection.query("SELECT * FROM Clients",function(err, rows, fields){ 
+	//eval(locus);
+	connection.end();
+	//eval(locus);
 	if (err){
 	  console.log(err);
 	  res.send(err);
-	  connection.end();
 	}
 	else{
-
 	  clients = rows;
-	  sess = req.session;
-	  db.connect(db.MODE_TEST, function(err,rows,pool){
+	  db.connect(db.MODE_TEST, function(err){
 	    if (err){
 	      console.log(err);
 	      res.send(err);
-	      pool.end();
 	    }
 	    else{
+	      sess = req.session;
 	      connection = db.get();
 	      connection.query("SELECT *,HOUR(TIMEDIFF(end,start)) as hours, MINUTE(TIMEDIFF(end,start)) as minutes  FROM Periods WHERE userid="+sess.userid,function(err, rows, fields){
+		//eval(locus);
+		connection.end();
+		//eval(locus);
 		if (err){
 		  console.log(err);
 		  res.send(err);
-		  connection.end();
 		}
 		else{
 		  //periods = Object.assign({},rows);
 		  periods = rows
-		  function getComments(periodid){
-		    connection = db.get()
+		  getComments = function(periodid){
 		    return new Promise((resolve,reject) => {
-
-		      connection.query("SELECT Users.firstname,Users.lastname, Comments.comment, Comments.periodid FROM Comments LEFT JOIN Users ON Comments.userid=Users.userid WHERE periodid="+periodid,function(err, rows, fields){
-			if (err){
-			  reject(err,connection);
+		      db.connect(db.MODE_TEST, function(err,rows,pool){
+			if(err){
+			  console.log(err);
+			  res.send(err);
+			  pool.end();
 			}
+
 			else{
-			  resolve(rows,connection);
+			  connection = db.get()
+			  connection.query("SELECT Users.firstname,Users.lastname, Comments.comment, Comments.periodid FROM Comments LEFT JOIN Users ON Comments.userid=Users.userid WHERE periodid="+periodid,function(err, rows, fields){
+			    //eval(locus);
+			    connection.end();
+			    //eval(locus);
+			    if (err){
+			      reject(err);
+			    }
+			    else{
+			      resolve(rows);
+			    }
+			  });
 			}
 		      });
+
 		    });
 		  }
 
+		  //eval(locus);
 		  comms = []
 		  for(p in periods){
 		    periodid = periods[p].periodid;
 		    comms.push(getComments(periodid));
 		  }
 
-		  Promise.all(comms).then(function(values,connection){
+		  //eval(locus);
+		  Promise.all(comms).then(function(values){
 
 		    comments = {};
 		    i=0;
@@ -70,6 +88,7 @@ timesheet.get('/', function(req, res, next) {
 		    }
 
 
+		    //eval(locus);
 		    res.render('timesheet',{
 		      firstname: sess.firstname,
 		      lastname: sess.lastname,
@@ -79,11 +98,8 @@ timesheet.get('/', function(req, res, next) {
 		      periods: rows,
 		      comments: comments,
 		    });
-
-		    connection.end()
 		  },
-		  function(error,connection){
-		    connection.end()
+		  function(error){
 		    console.log(error);
 		  });
 		}
@@ -107,10 +123,11 @@ timesheet.post('/add',function(req, res){
     end: req.body.date+' '+req.body.endtime
   };
 
-  db.create(db.MODE_TEST,'Periods',data,function(err,rows){
+  db.create(db.MODE_TEST,'Periods',data,function(err,rows,pool){
     if(err){
       console.log(err);
-      res.send(err);
+      req.flash('danger',"Error! Period not recorded. Please try again.");
+      res.redirect('/');
     }
     else{
       commentData={
@@ -119,13 +136,15 @@ timesheet.post('/add',function(req, res){
 	comment: req.body.comment
       }
 
-      db.create(db.MODE_TEST,'Comments',commentData,function(err,rows){
+      db.create(db.MODE_TEST,'Comments',commentData,function(err,rows, conn){
 	if(err){
 	  console.log(err);
-	  res.send(err);
+	  req.flash('danger',"Error! Period not recorded. Please try again.");
+	  res.redirect('/');
 	}
 	else{
-	  res.redirect('/')
+	  req.flash('success','Success! Period successfully recorded.');
+	  res.redirect('/');
 	}
       });
     }

@@ -21,6 +21,7 @@ clients.post('/create', function(req, res) {
     else{
       res.redirect('/')
     }
+    db.get().end();
     pool.end();
   });
 });
@@ -31,6 +32,7 @@ clients.get('/getAll', function(req, res){
     if (err){
       console.log(err);
       res.send(err);
+      db.get().end();
     }
     else{
       connection = db.get();
@@ -43,6 +45,7 @@ clients.get('/getAll', function(req, res){
 	else{
 	  res.send(rows);
 	}
+	db.get().end();
 	connection.end();
       });
     }

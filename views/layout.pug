@@ -1,3 +1,5 @@
+include mixins/flash-messages
+
 doctype html
 html
   head
@@ -21,4 +23,5 @@ html
         ul.nav.navbar-nav.navbar-right
           li.nav-item
             a.nav-link(href='/users/logout') Logout
+    +flash-messages(messages)
     block content

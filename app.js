@@ -10,13 +10,30 @@ var usersRouter = require('./routes/users');
 var clientsRouter = require('./routes/clients');
 var timesheetRouter = require('./routes/timesheet');
 var commentsRouter = require('./routes/comments');
+var flash = require('express-flash');
 
 var db = require('./db');
-for(i=1; i <= 3; i++){
-  db.initdb(function(pool){
-    pool.end();
-  });
-}
+
+db.connect(db.MODE_TEST, async function(err){
+  if(!err){
+    connection = db.get();
+    await db.initdb(connection, function(err){
+      if(err){
+	console.log(err);
+      }
+      else{
+	console.log("success");
+      }
+      db.get().end();
+    });
+  }
+  else{
+    connection.end();
+    res.send("Error Connecting to Database");
+  }
+});
+
+
 var app = express();
 
 // view engine setup
@@ -36,11 +53,19 @@ app.use(session({
 }));
 
 
+app.use(flash());
+
+app.use('/flash', function(req,res){
+  req.flash('success',"Flash Message.");
+  res.redirect('/');
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/clients', clientsRouter);
 app.use('/timesheet', timesheetRouter);
 app.use('/comments', commentsRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

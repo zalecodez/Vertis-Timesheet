@@ -4,18 +4,18 @@ block content
     form(method="POST" action="/users/register")
         div.form-group
             label(for='email') Email:
-            input#email.form-control(type='email', placeholder='Email' name='email')
+            input#email.form-control(required type='email', placeholder='Email' name='email')
         div.form-group
             label(for='firstname') First Name:
-            input#firstname.form-control(type='text', placeholder='First Name' name='firstname')
+            input#firstname.form-control(required type='text', placeholder='First Name' name='firstname')
         div.form-group
             label(for='lastname') Last Name:
-            input#lastname.form-control(type='text', placeholder='Last Name' name='lastname')
+            input#lastname.form-control(required type='text', placeholder='Last Name' name='lastname')
         div.form-group
             label(for='address') Address:
             input#address.form-control(type='address', placeholder='Address' name='address')
         div.form-group
             label(for='password') Password:
-            input#password.form-control(type='password', placeholder='Password' name='password')
+            input#password.form-control(required type='password', placeholder='Password' name='password')
         button.btn.btn-primary(type='submit') Register
  

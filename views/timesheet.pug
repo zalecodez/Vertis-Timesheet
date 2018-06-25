@@ -9,22 +9,22 @@ block content
         form(method="POST" action="/timesheet/add")
             div.form-group
                 label(for='title') Work Title:
-                input#title.form-control(type='title', placeholder='Title of Task' name='title')
+                input#title.form-control(required type='title', placeholder='Title of Task' name='title')
             div.form-group
                 label(for='clientid') Client:
-                select(name='clientid')
+                select(required name='clientid')
                     each c in clients
                         option(value=c.clientid) #{c.name} - Manager: #{c.firstname} #{c.lastname}, #{c.position}
             div.form-group
                 label(for='date') Date:
-                input#date.period.form-control(type='date' name='date')
+                input#date.period.form-control(required type='date' name='date')
             div.form-group
                 label(for='starttime') Start Time:
-                input#starttime.period.form-control(type='time' name='starttime')
+                input#starttime.period.form-control(required type='time' name='starttime')
 
             div.form-group
                 label(for='endtime') End Time:
-                input#endtime.period.form-control(type='time' name='endtime')
+                input#endtime.period.form-control(required type='time' name='endtime')
             div.form-group
                 h5#periodlength Period Length:  
 
