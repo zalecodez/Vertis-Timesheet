@@ -15,7 +15,7 @@ process.env.SECRET_KEY = 'veritest';
 
 users.get('/register', function(req, res) {
   sess = req.session
-  if(!sess.admin){
+  if(sess.admin){
     res.render('register');
   }
   else{
