@@ -24,7 +24,7 @@ db.connect(db.MODE_TEST, async function(err){
       else{
 	console.log("success");
       }
-      db.get().end();
+      connection.end();
     });
   }
   else{
