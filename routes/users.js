@@ -13,6 +13,11 @@ users.use(cors());
 
 process.env.SECRET_KEY = 'veritest';
 
+users.get('/all',function(req,res){
+  sess = req.session
+
+});
+
 users.get('/register', function(req, res) {
   sess = req.session
   if(sess.admin){

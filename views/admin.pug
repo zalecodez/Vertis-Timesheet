@@ -1,9 +1,15 @@
 extends layout
+
+mixin admin-card(url, text)
+    a(href=url)
+        div.card.text-center
+            div.card.bg-primary.text-white
+                div.card-body 
+                    h4 #{text} 
+    br
+
+
 block content
-
-    ul
-        li
-            a(href="/users/register") Create User
-
-        li
-            a(href="/clients/create") Create Client
+    div.container
+        +admin-card('/users/register/', "Create User")
+        +admin-card("/clients/create", "Create Client")

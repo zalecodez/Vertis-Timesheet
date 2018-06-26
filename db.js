@@ -23,26 +23,6 @@ exports.connect = function(done){
 exports.get = function(){
   return pool;
 }
-
-exports.create = function(table, data, done){
-  exports.connect(function(err, connection){
-    if (err) {
-      done(err);
-    }
-    else{
-      connection.query('INSERT INTO '+table+' SET ?', data, function(err, rows, fields) {
-	connection.release();
-	if (!err) {
-	  console.log("Success");
-	} else {
-	  console.log(err);
-	}
-	done(false, rows);
-      });
-    }
-  });
-};
-
 exports.query = function(query, data, done){
   exports.connect(function(err, connection){
     if(err){
@@ -58,6 +38,32 @@ exports.query = function(query, data, done){
 	  done(false, rows, fields)
 	}
       });
+    }
+  });
+};
+
+exports.create = function(table, data, done){
+  query = 'INSERT INTO '+table+' SET ?';
+  exports.query(query, data, function(err, rows, fields) {
+    if (!err) {
+      console.log("Success");
+      done(err);
+    } else {
+      console.log(err);
+      done(false, rows);
+    }
+  });
+};
+
+exports.getAll = function(table, done){
+  query = 'SELECT * FROM '+table;
+  exports.query(query, [], function(err, rows, fields) {
+    if (!err) {
+      console.log("Success");
+      done(err);
+    } else {
+      console.log(err);
+      done(false, rows);
     }
   });
 };
