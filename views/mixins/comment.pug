@@ -3,13 +3,15 @@ mixin comment-list(comments)
         h5.text-center No Comments
     else
         ul.list-group-flush
-            for c in comments
+            for c in comments.reverse()
                 +comment-item(c)
 
 mixin comment-item(c)
+    - console.log(c);
     li.list-group-item
         h6
             strong #{c.comment}
-        p - #{c.firstname} #{c.lastname}
-
+        p.text-muted #{c.firstname} #{c.lastname}
+            br
+            em #{c.timestamp}
 

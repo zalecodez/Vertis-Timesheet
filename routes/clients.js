@@ -23,40 +23,27 @@ clients.post('/create', function(req, res) {
     "position": req.body.position,
   }
 
-  db.create(db.MODE_TEST,'Clients',clientData,function(err,rows,pool){
+  db.create('Clients',clientData,function(err,rows,pool){
     if(err){
       console.log(err);
+      req.flash('danger','Error. Registration was unsuccessful. Please try again.');
     }
     else{
-      res.redirect('/')
+      req.flash('success',"Success. Client has been registered.");
     }
-    db.get().end();
-    pool.end();
+    res.redirect('/');
   });
 });
 
 
 clients.get('/getAll', function(req, res){
-  db.connect(db.MODE_TEST, function(err){
+  db.query("SELECT * FROM Clients",function(err, rows, fields){
     if (err){
       console.log(err);
       res.send(err);
-      db.get().end();
     }
     else{
-      connection = db.get();
-      
-      connection.query("SELECT * FROM Clients",function(err, rows, fields){
-	if (err){
-	  console.log(err);
-	  res.send(err);
-	}
-	else{
-	  res.send(rows);
-	}
-	db.get().end();
-	connection.end();
-      });
+      res.send(rows);
     }
   });
 });

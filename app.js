@@ -14,22 +14,12 @@ var flash = require('express-flash');
 
 var db = require('./db');
 
-db.connect(db.MODE_TEST, function(err){
-  if(!err){
-    connection = db.get();
-    db.initdb(connection, function(err){
-      if(err){
-	console.log(err);
-      }
-      else{
-	console.log("success");
-      }
-      connection.end();
-    });
+db.initdb(function(err){
+  if(err){
+    console.log(err);
   }
   else{
-    connection.end();
-    res.send("Error Connecting to Database");
+    console.log("success");
   }
 });
 

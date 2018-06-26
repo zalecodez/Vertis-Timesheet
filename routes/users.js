@@ -34,14 +34,15 @@ users.post('/register', function(req, res) {
     "address": req.body.address
   }
 
-  db.create(db.MODE_TEST,'Users',userData,function(err,rows,pool){
+  db.create('Users',userData,function(err,rows,pool){
     if(err){
       console.log(err);
+      req.flash('danger','Error. Registration was unsuccessful. Please try again.');
     }
     else{
-      res.redirect('/')
+      req.flash('success',"Success. User has been registered");
     }
-    pool.end();
+    res.redirect('/')
   });
 
 });
@@ -58,53 +59,42 @@ users.post('/login', function(req, res) {
   var email = req.body.email;
   var password = req.body.password;
 
-  db.connect(db.MODE_TEST, function(err){
+  db.query('SELECT * FROM Users WHERE email = ?', [email], function(err, rows, fields) {
     if (err) {
-      appData["error"] = 1;
-      appData["data"] = "Internal Server Error";
-      res.status(500).json(appData);
-      db.get().end();
+      console.log(err);
+      appData.error = 1;
+      appData["data"] = "Error Occured!";
+      res.status(400).json(appData);
     } else {
-      connection = db.get();
-      connection.query('SELECT * FROM Users WHERE email = ?', [email], function(err, rows, fields) {
-	connection.end();
-	if (err) {
-	  console.log(err);
-	  appData.error = 1;
-	  appData["data"] = "Error Occured!";
-	  res.status(400).json(appData);
-	} else {
-	  if (rows.length > 0) {
-	    if (rows[0].password == pass(password)) {
-	      console.log(rows[0])
-	      row = Object.assign({},rows[0]);
-	      appData.error = 0;
+      if (rows.length > 0) {
+	if (rows[0].password == pass(password)) {
+	  console.log(rows[0])
+	  row = Object.assign({},rows[0]);
+	  appData.error = 0;
 
-	      sess = req.session;
-	      sess.email = row.email;
-	      sess.firstname = row.firstname;
-	      sess.lastname = row.lastname;
-	      sess.address = row.address;
-	      sess.userid = row.userid;
-	      sess.admin = false;
+	  sess = req.session;
+	  sess.email = row.email;
+	  sess.firstname = row.firstname;
+	  sess.lastname = row.lastname;
+	  sess.address = row.address;
+	  sess.userid = row.userid;
+	  sess.admin = false;
 
-	      if(row.email == 'admin@vertistest.com'){
-		sess.admin = true;
-	      }
-
-	      res.redirect('/');
-
-	    } else {
-
-	      req.flash('danger',"Error! Credentials not recognized");
-	      res.redirect('/users/login');
-	    }
-	  } else {
-	      req.flash('danger',"Error! Credentials not recognized");
-	      res.redirect('/users/login');
+	  if(row.email == 'admin@vertistest.com'){
+	    sess.admin = true;
 	  }
+
+	  res.redirect('/');
+
+	} else {
+
+	  req.flash('danger',"Error! Credentials not recognized");
+	  res.redirect('/users/login');
 	}
-      });
+      } else {
+	  req.flash('danger',"Error! Credentials not recognized");
+	  res.redirect('/users/login');
+      }
     }
   });
 });
@@ -115,7 +105,6 @@ users.get('/logout', function(req, res) {
       console.log(err);
     }
     res.redirect('/');
-    db.get().end();
   });
 });
 

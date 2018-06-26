@@ -10,105 +10,66 @@ timesheet.get('/', function(req, res, next) {
     res.redirect('/users/login');
   }
   else{
-    db.connect(db.MODE_TEST, function(err){
+    db.query("SELECT * FROM Clients",function(err, rows, fields){ 
       if (err){
 	console.log(err);
 	res.send(err);
-	db.get().end();
       }
       else{
-	connection = db.get();
-	connection.query("SELECT * FROM Clients",function(err, rows, fields){ 
-	  //eval(locus);
-	  connection.end();
-	  //eval(locus);
+	clients = rows;
+	sess = req.session;
+	db.query("SELECT *,HOUR(TIMEDIFF(end,start)) as hours, MINUTE(TIMEDIFF(end,start)) as minutes  FROM Periods WHERE userid="+sess.userid,function(err, rows, fields){
 	  if (err){
 	    console.log(err);
 	    res.send(err);
 	  }
 	  else{
-	    clients = rows;
-	    db.connect(db.MODE_TEST, function(err){
-	      if (err){
-		console.log(err);
-		res.send(err);
-	      }
-	      else{
-		sess = req.session;
-		connection = db.get();
-		connection.query("SELECT *,HOUR(TIMEDIFF(end,start)) as hours, MINUTE(TIMEDIFF(end,start)) as minutes  FROM Periods WHERE userid="+sess.userid,function(err, rows, fields){
-		  //eval(locus);
-		  connection.end();
-		  //eval(locus);
+	    //periods = Object.assign({},rows);
+	    periods = rows
+	    getComments = function(periodid){
+	      return new Promise((resolve,reject) => {
+		db.query("SELECT Users.firstname,Users.lastname, Comments.comment, Comments.periodid, Comments.timestamp FROM Comments LEFT JOIN Users ON Comments.userid=Users.userid WHERE periodid="+periodid,function(err, rows, fields){
 		  if (err){
-		    console.log(err);
-		    res.send(err);
+		    reject(err);
 		  }
 		  else{
-		    //periods = Object.assign({},rows);
-		    periods = rows
-		    getComments = function(periodid){
-		      return new Promise((resolve,reject) => {
-			db.connect(db.MODE_TEST, function(err,rows,pool){
-			  if(err){
-			    console.log(err);
-			    res.send(err);
-			  }
-
-			  else{
-			    connection = db.get()
-			    connection.query("SELECT Users.firstname,Users.lastname, Comments.comment, Comments.periodid FROM Comments LEFT JOIN Users ON Comments.userid=Users.userid WHERE periodid="+periodid,function(err, rows, fields){
-			      //eval(locus);
-			      connection.end();
-			      //eval(locus);
-			      if (err){
-				reject(err);
-			      }
-			      else{
-				resolve(rows);
-			      }
-			    });
-			  }
-			});
-
-		      });
-		    }
-
-		    //eval(locus);
-		    comms = []
-		    for(p in periods){
-		      periodid = periods[p].periodid;
-		      comms.push(getComments(periodid));
-		    }
-
-		    //eval(locus);
-		    Promise.all(comms).then(function(values){
-
-		      comments = {};
-		      i=0;
-		      for(p in periods){
-			periodid = periods[p].periodid;
-			comments[periodid]=values[i++];
-		      }
-
-
-		      //eval(locus);
-		      res.render('timesheet',{
-			firstname: sess.firstname,
-			lastname: sess.lastname,
-			email: sess.email,
-			address: sess.address,
-			clients: clients,
-			periods: rows,
-			comments: comments,
-		      });
-		    },
-		    function(error){
-		      console.log(error);
-		    });
+		    resolve(rows);
 		  }
 		});
+	      });
+	    }
+
+	    //eval(locus);
+	    comms = []
+	    for(p in periods){
+	      periodid = periods[p].periodid;
+	      comms.push(getComments(periodid));
+	    }
+
+	    //eval(locus);
+	    Promise.all(comms).then(function(values){
+
+	      comments = {};
+	      i=0;
+	      for(p in periods){
+		periodid = periods[p].periodid;
+		comments[periodid]=values[i++];
 	      }
+
+
+	      //eval(locus);
+	      res.render('timesheet',{
+		firstname: sess.firstname,
+		lastname: sess.lastname,
+		email: sess.email,
+		address: sess.address,
+		clients: clients,
+		periods: rows,
+		comments: comments,
+	      });
+	    },
+	    function(error){
+	      console.log(error);
 	    });
 	  }
 	});
@@ -128,7 +89,7 @@ timesheet.post('/add',function(req, res){
     end: req.body.date+' '+req.body.endtime
   };
 
-  db.create(db.MODE_TEST,'Periods',data,function(err,rows,pool){
+  db.create('Periods',data,function(err,rows,pool){
     if(err){
       console.log(err);
       req.flash('danger',"Error! Period not recorded. Please try again.");
@@ -139,10 +100,11 @@ timesheet.post('/add',function(req, res){
 	commentData={
 	  userid: sess.userid,
 	  periodid: rows.insertId,
-	  comment: req.body.comment
+	  comment: req.body.comment,
+	  timestamp: new Date(),
 	}
 
-	db.create(db.MODE_TEST,'Comments',commentData,function(err,rows, conn){
+	db.create('Comments',commentData,function(err,rows, conn){
 	  if(err){
 	    console.log(err);
 	    req.flash('danger',"Error! Period not recorded. Please try again.");
@@ -169,10 +131,11 @@ timesheet.post('/addComment',function(req, res){
     commentData={
       userid: sess.userid,
       periodid: req.body.periodid,
-      comment: req.body.comment
+      comment: req.body.comment,
+      timestamp: new Date(),
     }
 
-    db.create(db.MODE_TEST,'Comments',commentData,function(err,rows, conn){
+    db.create('Comments',commentData,function(err,rows, conn){
       if(err){
 	console.log(err);
 	req.flash('danger','Error! Comment not added. Please try again.');
