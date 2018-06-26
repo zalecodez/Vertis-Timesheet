@@ -9,61 +9,20 @@ var token;
 var sess;
 
 
-/* GET users listing. */
-users.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
-
-
 users.use(cors());
 
 process.env.SECRET_KEY = 'veritest';
 
-users.get('/register', function(req, res, next) {
-  res.render('register');
-  next();
-});
-/*
-users.post('/register', function(req, res) {
-
-  var today = new Date();
-  var appData = {
-    "error": 1,
-    "data": ""
-  };
-  var userData = {
-    "firstname": req.body.firstname,
-    "lastname": req.body.lastname,
-    "email": req.body.email,
-    "password": pass(req.body.password),
-    "address": req.body.address
+users.get('/register', function(req, res) {
+  sess = req.session
+  if(sess.admin){
+    res.render('register');
   }
-
-
-  db.connect(db.MODE_TEST, function(err){
-    if (err) {
-      appData["error"] = 1;
-      appData["data"] = "Internal Server Error";
-      res.status(500).json(appData);
-    } else {
-      console.log(db.get());
-      connection = db.get();
-
-      connection.query('INSERT INTO Users SET ?', userData, function(err, rows, fields) {
-	if (!err) {
-	  appData.error = 0;
-	  appData["data"] = "User registered successfully!";
-	  res.status(201).json(appData);
-	} else {
-	  console.log(err)
-	  appData["data"] = "Error Occured!";
-	  res.status(400).json(appData);
-	}
-      });
-    }
-  });
+  else{
+    req.flash('danger',"Unauthorized. You must be admin to access that page.");
+    res.redirect('/');
+  }
 });
-*/
 
 users.post('/register', function(req, res) {
 
@@ -84,6 +43,7 @@ users.post('/register', function(req, res) {
     }
     pool.end();
   });
+
 });
 
 
@@ -162,30 +122,38 @@ users.get('/logout', function(req, res) {
 
 users.get('/getUsers', function(req, res) {
 
-  var token = req.body.token || req.headers['token'];
-  var appData = {};
+  sess = req.session
+  if(sess.admin){
+    var token = req.body.token || req.headers['token'];
+    var appData = {};
 
-  db.connect(db.MODE_TEST, function(err){
-    if (err) {
-      appData["error"] = 1;
-      appData["data"] = "Internal Server Error";
-      res.status(500).json(appData);
-      db.get().end();
-    } else {
-      connection = db.get();
-      connection.query('SELECT * FROM Users', function(err, rows, fields) {
-	if (!err) {
-	  appData["error"] = 0;
-	  appData["data"] = rows;
-	  res.status(200).json(appData);
-	} else {
-	  appData["data"] = "No data found";
-	  res.status(204).json(appData);
-	}
-      });
-      db.get().end();
-    }
-  });
+    db.connect(db.MODE_TEST, function(err){
+      if (err) {
+	appData["error"] = 1;
+	appData["data"] = "Internal Server Error";
+	res.status(500).json(appData);
+	db.get().end();
+      } else {
+	connection = db.get();
+	connection.query('SELECT * FROM Users', function(err, rows, fields) {
+	  if (!err) {
+	    appData["error"] = 0;
+	    appData["data"] = rows;
+	    res.status(200).json(appData);
+	  } else {
+	    appData["data"] = "No data found";
+	    res.status(204).json(appData);
+	  }
+	});
+	db.get().end();
+      }
+    });
+  }
+
+  else{
+    req.flash("Unauthorized. You must be admin to access that page.");
+    res.redirect('/');
+  }
 });
 
 module.exports = users;

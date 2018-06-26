@@ -53,6 +53,10 @@ app.use(session({
 }));
 
 
+app.use(function(req, res, next){
+  res.locals.session = req.session;
+  next();
+});
 app.use(flash());
 
 app.use('/flash', function(req,res){

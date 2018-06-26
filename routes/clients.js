@@ -1,9 +1,18 @@
 var express = require('express');
 var clients = express.Router();
 var db = require('../db');
+var sess;
 
 clients.get('/create',function(req, res){
-  res.render('createClient');
+  sess = req.session
+
+  if(sess.admin){
+    res.render('createClient');
+  }
+  else{
+    req.flash('danger','Unauthorized. You must be admin to access that page');
+    res.redirect('/');
+  }
 });
 
 clients.post('/create', function(req, res) {

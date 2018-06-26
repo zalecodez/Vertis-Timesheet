@@ -1,3 +1,5 @@
+include comment.pug
+
 mixin periodList(periods,clients)
     h2 Timesheet History
     each p in periods.reverse()
@@ -5,7 +7,7 @@ mixin periodList(periods,clients)
 
 mixin periodItem(period)
     - periodid = period.periodid;
-    div.card.mb-3.text-center
+    div.card.mb-3
         div.timesheetCarousel.carousel.slide(id="carousel"+periodid)
             div.card-header 
                 ul.nav.nav-pills.card-header-pills
@@ -15,7 +17,7 @@ mixin periodItem(period)
                         a.nav-link Comments
             div.carousel-inner
                 div.carousel-item.active
-                    div.card-body.text-primary
+                    div.text-center.card-body.text-primary
                         - c = clients[period.clientid-1]
                         h6.card-title #{period.title}
                         h6.card-title Client: #{c.name} - Manager: #{c.firstname} #{c.lastname}, #{c.position}
@@ -23,13 +25,16 @@ mixin periodItem(period)
                         p.card-text #{period.hours} Hour(s), #{period.minutes} Minute(s)
                 div.carousel-item
                     div.card-body.text-primary
-                        if comments[periodid].length == 0
-                            h6.card-title No Comments
+                        div(class="comments-"+periodid) 
+                            if comments[periodid].length == 0
+                                h6.card-title No Comments
 
-                        else
-                            h6.card-title Comments
-                            div(class="comments-"+periodid) 
-                                - console.log(comments[periodid])
-                                each c in comments[periodid]
-                                    p #{c.firstname} #{c.lastname} - #{c.comment}
+                            else
+                                if(comments[periodid])
+                                    +comment-list(comments[periodid])
 
+                        form(method="POST" action="/timesheet/addComment")
+                            input#periodid(type='hidden' name='periodid' value=periodid)
+                            div.form-group
+                                textarea#comment.form-control(required placeholder="Add Comment" rows='2' name='comment')
+                            button#submitPeriod.btn.btn-primary(type='submit') Post

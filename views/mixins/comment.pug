@@ -1,0 +1,15 @@
+mixin comment-list(comments)
+    if (!comments || comments.length == 0)
+        h5.text-center No Comments
+    else
+        ul.list-group-flush
+            for c in comments
+                +comment-item(c)
+
+mixin comment-item(c)
+    li.list-group-item
+        h6
+            strong #{c.comment}
+        p - #{c.firstname} #{c.lastname}
+
+

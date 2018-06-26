@@ -1,18 +1,47 @@
 $(document).ready(function(){
+
+
   diff = calculateDiffMs();
   periodlength = lengthString(diff);
   $("#periodlength").text("Period Length: "+periodlength);
 
-  if(isNaN(diff)){
+  if(isNaN(diff) || diff < 0){
     $("#submitPeriod").addClass("disabled");
+    $("#submitPeriod").prop('disabled',true);
+    if(!isNaN(diff) && diff < 0){
+      $("#submitPeriod").prop('data-toggle','tooltip').prop('title',"Start Time can't be before End Time.");
+      $("#submitPeriod").tooltip();
+    }
   }
   else{
     $("#submitPeriod").removeClass("disabled");
+    $("#submitPeriod").prop('disabled',false);
+    $("#submitPeriod").removeProp('data-toggle').removeProp('title');
+    $("#submitPeriod").tooltip('dispose');
   }
+
   $(".period").change(function(){
     diff = calculateDiffMs();
     periodlength = lengthString(diff);
     $("#periodlength").text("Period Length: "+periodlength);
+
+
+    if(isNaN(diff) || diff < 0){
+      $("#submitPeriod").addClass("disabled");
+      $("#submitPeriod").prop('disabled',true);
+      if(!isNaN(diff) && diff < 0){
+	$("#submitPeriod").prop('data-toggle','tooltip').prop('title',"Start Time can't be before End Time.");
+	$("#submitPeriod").tooltip();
+      }
+    }
+    else{
+      $("#submitPeriod").removeClass("disabled");
+      $("#submitPeriod").prop('disabled',false);
+      $("#submitPeriod").removeProp('data-toggle').removeProp('title');
+      $("#submitPeriod").tooltip('dispose');
+    }
+
+
   });
 
   $(".timesheetCarousel").carousel({interval:false});
@@ -24,7 +53,10 @@ $(document).ready(function(){
     $(this).parent().siblings('li').children('.active').removeClass('active');
   });
 
+  $('[data-toggle="tooltip"]').tooltip();
+
 });
+
 
 function calculateDiffMs(){
   date = $("#date").val();
